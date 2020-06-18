@@ -80,8 +80,11 @@ def display_database():
     database = r"Holdings.db"
     conn = create_connection(database)
     with conn:
-        print("test:")
         select_all_database(conn)
 
+def get_date():
+    from datetime import date
+    print(date.today().strftime("%d/%m/%Y"))
+
 if __name__ == '__main__':
-    update_database()
+    get_time()
