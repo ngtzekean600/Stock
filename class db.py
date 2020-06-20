@@ -85,10 +85,48 @@ class stocks(database):
             if (sqliteConnection):
                 sqliteConnection.close()
                 print("The SQLite connection is closed")
-class scrapbook():
+class scrapbook(database):
     def __init__(self):
-        pass
+        super().__init__()
+        self.__table = 'Scrapbook'
+    def insert_database(self):
+        try:
+            sqliteConnection = self.create_connection()
+            cursor = sqliteConnection.cursor()
+
+            name = 'HiP'#input('What is your Stock: ')
+            volume = 5 #int(input('What is your Volume: '))
+            price = 5 #int(input('What is your price: '))
+            cursor.execute('INSERT INTO {0}(Name,Volume,Price)\
+                            VALUES(?,?,?)'.format(self.__table),[name,volume,price])
+            sqliteConnection.commit()
+            cursor.close()
+            print("Record inserted successfully:", name)
+            
+        except sqlite3.Error as error:
+            print("Failed to update sqlite table:", error)
+        finally:
+            if (sqliteConnection):
+                sqliteConnection.close()
+                print("The SQLite connection is closed")
+    def display_database(self):
+        try:
+            sqliteConnection = self.create_connection()
+            cursor = sqliteConnection.cursor()
+            cursor.execute("SELECT * FROM {0}".format(self.__table))
+
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        
+        except sqlite3.Error as error:
+            print("Failed to update sqlite table:", error)
+        finally:
+            if (sqliteConnection):
+                sqliteConnection.close()
+                print("The SQLite connection is closed")
 
 if __name__ == '__main__':
-    s = stocks()
+    s = scrapbook()
+    s.insert_database()
     s.display_database()
