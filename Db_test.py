@@ -1,8 +1,8 @@
 import sqlite3
 
-def update_database():
+def update_database(database):
     try:
-        sqliteConnection = create_connection('Holdings.db')
+        sqliteConnection = create_connection(database)
         cursor = sqliteConnection.cursor()
 
         name = 'OCBC'#input('What is your Stock: ')
@@ -21,9 +21,9 @@ def update_database():
             sqliteConnection.close()
             print("The SQLite connection is closed")
 
-def insert_database():
+def insert_database(database):
     try:
-        sqliteConnection = create_connection('Holdings.db')
+        sqliteConnection = create_connection(database)
         cursor = sqliteConnection.cursor()
 
         name = 'DBS'#input('What is your Stock: ')
@@ -42,46 +42,45 @@ def insert_database():
             sqliteConnection.close()
             print("The SQLite connection is closed")
 
-def create_connection(db_file):
-    """ create a database connection to the SQLite database
-        specified by the db_file
-    :param db_file: database file
-    :return: Connection object or None
-    """
+def display_database(database):
+    try:
+        sqliteConnection = create_connection(database)
+        cursor = sqliteConnection.cursor()
+        cursor.execute("SELECT * FROM Stocks")
+
+        rows = cursor.fetchall()
+        for row in rows:
+            print(row)
+    
+    except sqlite3.Error as error:
+        print("Failed to update sqlite table:", error)
+    finally:
+        if (sqliteConnection):
+            sqliteConnection.close()
+            print("The SQLite connection is closed")        
+
+def create_connection(database):
     conn = None
     try:
-        conn = sqlite3.connect(db_file)
+        conn = sqlite3.connect(database)
         print("Connected to SQLite")
     except sqlite3.Error as e:
         print(e)
     return conn
 
-def select_all_database(conn):
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM Stocks")
-
-    rows = cur.fetchall()
-    for row in rows:
-        print(row)
-
 def fetch_name(sqliteConnection,name):
     cur = sqliteConnection.cursor()
-    ID =1 
     cur.execute("SELECT * FROM Stocks WHERE Name = ?",[name])
     return cur.fetchall()
 
 def fetch_volume(sqliteConnection,volume):
     cur = sqliteConnection.cursor()
-    ID =1 
     cur.execute("SELECT * FROM Stocks WHERE Volume = ?",[Volume])
     return cur.fetchall()
 
-def display_database():
-    database = r"Holdings.db"
-    conn = create_connection(database)
-    with conn:
-        print("test:")
-        select_all_database(conn)
+def get_date():
+    from datetime import date
+    print(date.today().strftime("%d/%m/%Y"))
 
 if __name__ == '__main__':
-    update_database()
+    display_database('Holdings.db')
