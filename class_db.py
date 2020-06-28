@@ -37,14 +37,14 @@ class stocks(database):
     def __init__(self):
         super().__init__()
         self.__table = 'Stocks'
-    def update_database(self,name,volume,price):
+    def update_database(self,name,code,average_cost=0,volume=0):
         if not self.in_database(name,self.__table):
-            self.insert_database(name,volume,price)
+            self.insert_database(name,code,average_cost,volume)
             return
         try:
             sqliteConnection = self.create_connection()
             cursor = sqliteConnection.cursor()
-            cursor.execute('UPDATE Stocks SET Volume=?,Price=? where Name=?',[volume,price,name])
+            cursor.execute('UPDATE Stocks SET Volume=?,AverageCost=? where Name=?',[volume,average_cost,name])
             sqliteConnection.commit()
             cursor.close()
             print("Record updated successfully:", self.fetch_name(sqliteConnection,name,self.__table))
@@ -53,16 +53,15 @@ class stocks(database):
         finally:
             self.close_database(sqliteConnection)
 
-    def insert_database(self,name,volume,price):
+    def insert_database(self,name,code,average_cost=0,volume=0):
         try:
             sqliteConnection = self.create_connection()
             cursor = sqliteConnection.cursor()
-            cursor.execute('INSERT INTO Stocks(Name,Volume,Price)\
-                            VALUES(?,?,?)',[name,volume,price])
+            cursor.execute('INSERT INTO Stocks(Name,Volume,Code,AverageCost)\
+                            VALUES(?,?,?,?)',[name,volume,code,average_cost])
             sqliteConnection.commit()
             cursor.close()
             print("Record inserted successfully:", self.fetch_name(sqliteConnection,name,self.__table))
-            
         except sqlite3.Error as error:
             print("Failed to update sqlite table:", error)
         finally:
@@ -88,19 +87,19 @@ class scrapbook(database):
     def __init__(self):
         super().__init__()
         self.__table = 'Scrapbook'
-    def insert_database(self,name,volume,price):
+    def insert_database(self,code,volume=0,price=0):
         try:
             sqliteConnection = self.create_connection()
             cursor = sqliteConnection.cursor()
-            cursor.execute('INSERT INTO {0}(Name,Volume,Price)\
-                            VALUES(?,?,?)'.format(self.__table),[name,volume,price])
+            cursor.execute('INSERT INTO Scrapbook(Code,Volume,Price) VALUES(?,?,?)',[code,volume,price])
             sqliteConnection.commit()
             cursor.close()
-            print("Record inserted successfully:", name)
+            print("Record inserted successfully:", code)
         except sqlite3.Error as error:
             print("Failed to update sqlite table:", error)
         finally:
             self.close_database(sqliteConnection)
+            
     def display_database(self):
         try:
             sqliteConnection = self.create_connection()
@@ -117,6 +116,7 @@ class scrapbook(database):
             self.close_database(sqliteConnection)
 
 if __name__ == '__main__':
-    s = stocks()
-    s.update_database('DD',20,1)
-    s.display_database()
+    S=stocks()
+    s = scrapbook()
+    #S.update_database('Code','OCBC')
+    s.insert_database('TT')
