@@ -32,6 +32,8 @@ class database():
             print("The SQLite connection is closed")
         else:
             print('Connection had not been establised')
+    def start_fk(self,cursor):
+        cursor.execute("PRAGMA foreign_keys=ON")
 ###############################################################################
 class stocks(database):
     def __init__(self):
@@ -91,7 +93,9 @@ class scrapbook(database):
         try:
             sqliteConnection = self.create_connection()
             cursor = sqliteConnection.cursor()
-            cursor.execute('INSERT INTO Scrapbook(Code,Volume,Price) VALUES(?,?,?)',[code,volume,price])
+            self.start_fk(cursor)#Enforce foreign key
+            cursor.execute('INSERT INTO Scrapbook(Code,Volume,Price)\
+                            VALUES(?,?,?)',[code,volume,price])
             sqliteConnection.commit()
             cursor.close()
             print("Record inserted successfully:", code)
@@ -119,4 +123,4 @@ if __name__ == '__main__':
     S=stocks()
     s = scrapbook()
     #S.update_database('Code','OCBC')
-    s.insert_database('TT')
+    s.display_database()
