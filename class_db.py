@@ -20,7 +20,7 @@ class database():
         return cur.fetchall()
     def get_date(self):
         from datetime import date
-        print(date.today().strftime("%d/%m/%Y"))
+        return date.today().strftime("%d/%m/%Y")
     def in_database(self,name,table):
         sqliteConnection = self.create_connection()
         if self.fetch_name(sqliteConnection,name,table) != []:
@@ -34,7 +34,7 @@ class database():
             print('Connection had not been establised')
     def start_fk(self,cursor):
         cursor.execute("PRAGMA foreign_keys=ON")
-###############################################################################
+######################################################################################################################
 class stocks(database):
     def __init__(self):
         super().__init__()
@@ -77,6 +77,7 @@ class stocks(database):
 
             rows = cursor.fetchall()
             print('-----------------'+self.__table+'--------------------')
+            print('{0} {1} {2} {3} {4}'.format('ID','Code','Volume','Price','Date'))
             for row in rows:
                 print(row)
             print('------------------------------------------------------')
@@ -84,7 +85,7 @@ class stocks(database):
             print("Failed to update sqlite table:", error)
         finally:
             self.close_database(sqliteConnection)
-###############################################################################
+#########################################################################################################################
 class scrapbook(database):
     def __init__(self):
         super().__init__()
@@ -94,8 +95,8 @@ class scrapbook(database):
             sqliteConnection = self.create_connection()
             cursor = sqliteConnection.cursor()
             self.start_fk(cursor)#Enforce foreign key
-            cursor.execute('INSERT INTO Scrapbook(Code,Volume,Price)\
-                            VALUES(?,?,?)',[code,volume,price])
+            cursor.execute('INSERT INTO Scrapbook(Code,Volume,Price,Date)\
+                            VALUES(?,?,?,?)',[code,volume,price,self.get_date()])
             sqliteConnection.commit()
             cursor.close()
             print("Record inserted successfully:", code)
@@ -111,8 +112,9 @@ class scrapbook(database):
             cursor.execute("SELECT * FROM " + self.__table)
             rows = cursor.fetchall()
             print('-----------------'+self.__table+'--------------------')
+            print('{0:^5}{1:^5}{2:^10}{3:^5}{4:>10}'.format('ID','Code','Volume','Price','Date'))
             for row in rows:
-                print(row)
+                print('{0:^5}{1:^5}{2:^10}{3:^5}{4:>15}'.format(row[0],row[1],row[2],row[3],row[4]))
             print('------------------------------------------------------')
         except sqlite3.Error as error:
             print("Failed to update sqlite table:", error)
@@ -121,6 +123,7 @@ class scrapbook(database):
 
 if __name__ == '__main__':
     S=stocks()
-    s = scrapbook()
+    s=scrapbook()
     #S.update_database('Code','OCBC')
+    #s.insert_database('Code')
     s.display_database()
